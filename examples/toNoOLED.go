@@ -1,4 +1,4 @@
-// +build !ssd1306
+// +build !ssd1306,!sh1106
 
 package main
 
