@@ -7,7 +7,7 @@ import (
 	akc695x "github.com/toyo/tinygo-akc695x"
 )
 
-func tuner(c1 chan [2]string, wait *sync.WaitGroup) {
+func tuner(resetpin machine.Pin, c1 chan [2]string, wait *sync.WaitGroup) {
 	defer wait.Done()
 
 	var r akc695x.AKC695X
@@ -15,6 +15,7 @@ func tuner(c1 chan [2]string, wait *sync.WaitGroup) {
 	if err := r.Configure(akc695x.AKC695XConfig{
 		I2CInterface:     machine.I2C0,
 		I2CAddr:          akc695x.Address,
+		ResetPin:         resetpin,
 		AMBand:           2,     // JP Band
 		FMBand:           7,     // JP Band
 		FMLow:            76000, // JP Band

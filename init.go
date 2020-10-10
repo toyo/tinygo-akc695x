@@ -2,6 +2,7 @@ package akc695x
 
 import (
 	"machine"
+	"time"
 )
 
 type AKC695XConfig struct {
@@ -10,11 +11,13 @@ type AKC695XConfig struct {
 	AMBand, FMBand   uint8
 	FMLow, FMHigh    uint32
 	VolumeControlI2C bool
+	ResetPin         machine.Pin // if No ResetPin, set 255.
 }
 
 type AKC695X struct {
 	i2cinterface      machine.I2C
 	i2caddr           uint8
+	resetpin          machine.Pin
 	reg               []byte
 	amband, fmband    uint8
 	mwband            uint8
@@ -27,6 +30,15 @@ func (r *AKC695X) Configure(config AKC695XConfig) (err error) {
 
 	r.i2cinterface = config.I2CInterface
 	r.i2caddr = config.I2CAddr
+	r.resetpin = config.ResetPin
+
+	if r.resetpin != 255 {
+		r.resetpin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+		r.resetpin.Set(false)
+		time.Sleep(10 * time.Millisecond)
+		r.resetpin.Set(true)
+		time.Sleep(10 * time.Millisecond)
+	}
 
 	if r.reg == nil {
 		r.reg = make([]byte, 0x0e)

@@ -20,7 +20,7 @@ func main() {
 	messageFromTunerToDisplay := make(chan [2]string)
 
 	wait.Add(1)
-	go tuner(messageFromTunerToDisplay, &wait)
+	go tuner(machine.D3, messageFromTunerToDisplay, &wait)
 
 	wait.Add(1)
 	go statusMonitor(messageFromTunerToDisplay, &wait)
