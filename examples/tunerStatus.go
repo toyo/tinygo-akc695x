@@ -17,10 +17,11 @@ func tunerStatus(r *akc695x.AKC695X, c1 chan [2]string, wait *sync.WaitGroup) {
 		if !r.IsSeekComplete() {
 			s[0] = `Seeking`
 		} else {
-			s[0] = r.GetFreqString() + ` ` + strconv.Itoa(int(r.GetCNRFM())) + `dB`
+			s[0] = r.GetFreqString() + ` ` + strconv.Itoa(int(r.GetCNR())) + `dB`
 		}
 
-		s[1] = `Vol` + strconv.Itoa(int(r.GetVolume())) + ` ` +
+		s[1] = strconv.Itoa(int(r.GetRSSIdBuV())) + `dBu ` +
+			`Vol` + strconv.Itoa(int(r.GetVolume())) + ` ` +
 			strconv.FormatFloat(float64(r.GetVCCMilliVolt())/1000, 'f', 2, 32) + `V`
 
 		select {

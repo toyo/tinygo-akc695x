@@ -12,7 +12,7 @@ func tuner(resetpin machine.Pin, c1 chan [2]string, givenWait *sync.WaitGroup) {
 
 	var r akc695x.AKC695X
 
-	if err := r.Configure(akc695x.AKC695XConfig{
+	if err := r.Configure(akc695x.Config{
 		I2CInterface:     machine.I2C0,
 		I2CAddr:          akc695x.Address,
 		ResetPin:         resetpin,
