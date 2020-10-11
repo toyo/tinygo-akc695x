@@ -69,9 +69,6 @@ func (r AKC695X) setFMBand() {
 	band := r.fmband
 	r.reg[0x01] &= 0b11111000
 	r.reg[0x01] |= (band & 0b00000111)
-	if r.fmband >= 7 {
-		r.setChannelRange(r.fmlowch, r.fmhighch)
-	}
 }
 
 func (r AKC695X) SetRef32kMode(b bool) {

@@ -47,7 +47,7 @@ func (r AKC695X) GetFreqString() (freq string) {
 	return
 }
 
-func (r AKC695X) SetFreq(kHz uint32) (err error) {
+func (r AKC695X) setFreq(kHz uint32) (err error) {
 	channel, isfm := r.freqToChannel(kHz)
 	if r.isFM() {
 		if 150 <= kHz && kHz <= 285 {
@@ -94,19 +94,41 @@ func (r AKC695X) SetFreq(kHz uint32) (err error) {
 			r.setAMBand()
 		}
 		r.setFM(isfm)
-		if err = r.writeReg(0, 2); err != nil {
+		if err = r.writeReg(0, 2); err != nil { // For check the step is 3kHz or 5kHz.
 			return
 		}
 		channel, isfm = r.freqToChannel(kHz)
 	} else {
 		r.setFM(isfm)
 		r.setFMBand()
+		if err = r.writeReg(0, 1); err != nil { // Set FM Band.
+			return
+		}
+		if r.fmband >= 7 {
+			r.setChannelRange(r.fmlowch, r.fmhighch)
+			if err = r.writeReg(4, 5); err != nil { // Set FM Band Width.
+				return
+			}
+		}
 	}
 
 	r.setChannel(channel)
+
+	return
+}
+
+func (r AKC695X) SetFreq(kHz uint32) (err error) {
+	r.setTune(false)
+	if err = r.writeReg(0, 0); err != nil {
+		return
+	}
+
+	if err = r.setFreq(kHz); err != nil {
+		return
+	}
+
 	r.setTune(true)
-	r.setMute(true)
-	if err = r.writeReg(0, 5); err != nil {
+	if err = r.writeReg(0, 3); err != nil {
 		return
 	}
 
@@ -115,18 +137,12 @@ func (r AKC695X) SetFreq(kHz uint32) (err error) {
 	}
 	fmt.Println(`Tuned`)
 
-	r.setTune(false)
-	r.setMute(false)
-	if err = r.writeReg(0, 0); err != nil {
-		return
-	}
 	return nil
 }
 
 func (r AKC695X) Seek(seekup bool) (err error) {
 	r.setSeekUp(seekup)
 	r.setSeek(true)
-	r.setMute(true)
 	if err = r.writeReg(0, 0); err != nil {
 		return
 	}
@@ -137,7 +153,6 @@ func (r AKC695X) Seek(seekup bool) (err error) {
 	fmt.Println(`SeekComplete`)
 
 	r.setSeek(false)
-	r.setMute(false)
 	if err = r.writeReg(0, 0); err != nil {
 		return
 	}

@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func tunerControl(message string, funcMap map[byte]func() error, wait1 *sync.WaitGroup) {
-	defer wait1.Done()
+func tunerControl(message string, funcMap map[byte]func() error, wait *sync.WaitGroup) {
+	defer wait.Done()
 
 	fmt.Print(message)
 	rbuf := make([]byte, 1)

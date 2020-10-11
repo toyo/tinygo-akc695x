@@ -2,10 +2,14 @@ package akc695x
 
 // REG06-REG07
 
-// SetVolume set volume. vol from 0 to 63.
-func (r AKC695X) SetVolume(vol uint8) error {
+func (r AKC695X) setVolume(vol uint8) {
 	r.reg[0x06] &= 0b00000011
 	r.reg[0x06] |= vol << 2
+}
+
+// SetVolume set volume. vol from 0 to 63.
+func (r AKC695X) SetVolume(vol uint8) error {
+	r.setVolume(vol)
 	return r.writeReg(6, 6)
 }
 

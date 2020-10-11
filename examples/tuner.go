@@ -7,8 +7,8 @@ import (
 	akc695x "github.com/toyo/tinygo-akc695x"
 )
 
-func tuner(resetpin machine.Pin, c1 chan [2]string, wait *sync.WaitGroup) {
-	defer wait.Done()
+func tuner(resetpin machine.Pin, c1 chan [2]string, givenWait *sync.WaitGroup) {
+	defer givenWait.Done()
 
 	var r akc695x.AKC695X
 
@@ -20,25 +20,19 @@ func tuner(resetpin machine.Pin, c1 chan [2]string, wait *sync.WaitGroup) {
 		FMBand:           7,     // JP Band
 		FMLow:            76000, // JP Band
 		FMHigh:           95000, // JP Band
+		InitialkHz:       79500, // JODV-FM
 		VolumeControlI2C: true,
+		Volume:           50,
 	}); err != nil {
 		panic(err)
 	}
 
-	if err := r.SetFreq(79500); err != nil { // JODV-FM
-		panic(err)
-	}
+	var wait sync.WaitGroup
 
-	if err := r.SetVolume(50); err != nil {
-		panic(err)
-	}
+	wait.Add(1)
+	go tunerStatus(&r, c1, &wait)
 
-	var wait1 sync.WaitGroup
-
-	wait1.Add(1)
-	go tunerStatus(&r, c1, &wait1)
-
-	wait1.Add(1)
+	wait.Add(1)
 	go tunerControl("Command reference\n"+
 		"Type + to Volume up\n"+
 		"Type - to Volume down\n"+
@@ -59,7 +53,7 @@ func tuner(resetpin machine.Pin, c1 chan [2]string, wait *sync.WaitGroup) {
 			'y': func() error { return r.SetFreq(84700) }, // JOTU-FM
 			'5': func() error { return r.SetFreq(79500) }, // JODV-FM
 			'c': func() error { return r.SetFreq(78000) }, // JOGV-FM
-		}, &wait1) // Please customize the frequency list. This sample is only for Tokyo.
+		}, &wait) // Please customize the frequency list. This sample is only for Tokyo.
 
-	wait1.Wait()
+	wait.Wait()
 }

@@ -9,8 +9,8 @@ import (
 	akc695x "github.com/toyo/tinygo-akc695x"
 )
 
-func tunerStatus(r *akc695x.AKC695X, c1 chan [2]string, wait1 *sync.WaitGroup) {
-	defer wait1.Done()
+func tunerStatus(r *akc695x.AKC695X, c1 chan [2]string, wait *sync.WaitGroup) {
+	defer wait.Done()
 
 	for {
 		var s [2]string
