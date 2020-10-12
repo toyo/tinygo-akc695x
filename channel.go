@@ -4,6 +4,10 @@ import (
 	"strconv"
 )
 
+func freqToChannelFM(kHz uint32) (ch uint16) {
+	return uint16((kHz - 30000) / 25)
+}
+
 func (r AKC695X) freqToChannelAM(kHz uint32) (ch uint16) {
 	if r.isMode3k() {
 		ch = uint16(kHz / 3)
@@ -11,10 +15,6 @@ func (r AKC695X) freqToChannelAM(kHz uint32) (ch uint16) {
 		ch = uint16(kHz / 5)
 	}
 	return
-}
-
-func (r AKC695X) freqToChannelFM(kHz uint32) (ch uint16) {
-	return uint16((kHz - 30000) / 25)
 }
 
 func (r AKC695X) channelToFreq(ch uint16) (kHz uint32) {

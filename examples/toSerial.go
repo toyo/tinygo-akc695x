@@ -1,12 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-func toSerial(c chan [2]string) {
+func toSerial(c chan []string) {
 	for i := 0; ; i++ {
 		if s, more := <-c; more {
-			if i%5 == 0 {
-				fmt.Println(s[0], s[1])
+			if i%10 == 0 {
+				fmt.Println(strings.Join(s, ` `))
 			}
 		} else {
 			fmt.Println(`Channel closed for Serial`)

@@ -7,22 +7,18 @@ import (
 	akc695x "github.com/toyo/tinygo-akc695x"
 )
 
-func tuner(resetpin machine.Pin, c1 chan [2]string, givenWait *sync.WaitGroup) {
+// Please set resetpin to 255 if there is no p_on connetction.
+func tuner(resetpin machine.Pin, c1 chan []string, givenWait *sync.WaitGroup) {
 	defer givenWait.Done()
 
-	var r akc695x.AKC695X
+	r := akc695x.New(machine.I2C0)
 
 	if err := r.Configure(akc695x.Config{
-		I2CInterface:     machine.I2C0,
-		I2CAddr:          akc695x.Address,
-		ResetPin:         resetpin,
-		AMBand:           2,     // JP Band
-		FMBand:           7,     // JP Band
-		FMLow:            76000, // JP Band
-		FMHigh:           95000, // JP Band
-		InitialkHz:       79500, // JODV-FM
-		VolumeControlI2C: true,
-		Volume:           50,
+		ResetPin: resetpin,
+		MWBand:   2,     // JP Band
+		FMBand:   7,     // JP Band
+		FMLow:    76000, // JP Band
+		FMHigh:   95000, // JP Band
 	}); err != nil {
 		panic(err)
 	}
@@ -34,11 +30,15 @@ func tuner(resetpin machine.Pin, c1 chan [2]string, givenWait *sync.WaitGroup) {
 
 	wait.Add(1)
 	go tunerControl("Command reference\n"+
-		"Type + to Volume up\n"+
-		"Type - to Volume down\n"+
-		"Type s to Seek incrementaly\n"+
-		"Type r to Seek decrementaly\n",
+		"Type P for Power On\n"+
+		"Type p for Power Off\n"+
+		"Type + for Volume up\n"+
+		"Type - for Volume down\n"+
+		"Type s for Seek incrementaly\n"+
+		"Type r for Seek decrementaly\n",
 		map[byte]func() error{
+			'P': func() error { return r.PowerOn(79500, 50, true) }, // JODV-FM
+			'p': r.PowerOff,
 			'+': r.VolumeUp,
 			'-': r.VolumeDown,
 			's': func() error { return r.Seek(true) },

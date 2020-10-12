@@ -17,7 +17,7 @@ func main() {
 		return
 	}
 
-	messageFromTunerToDisplay := make(chan [2]string)
+	messageFromTunerToDisplay := make(chan []string)
 
 	wait.Add(1)
 	go tuner(machine.D3, messageFromTunerToDisplay, &wait)

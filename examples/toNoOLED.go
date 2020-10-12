@@ -2,7 +2,7 @@
 
 package main
 
-func toOLED(c chan [2]string) {
+func toOLED(c chan []string) {
 	for {
 		if _, more := <-c; !more {
 			break

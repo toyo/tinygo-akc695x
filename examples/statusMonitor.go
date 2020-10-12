@@ -5,17 +5,21 @@ import (
 	"sync"
 )
 
-func statusMonitor(c chan [2]string, w *sync.WaitGroup) {
+func statusMonitor(c chan []string, w *sync.WaitGroup) {
 	defer w.Done()
 
-	toOLEDChan := make(chan [2]string)
+	toOLEDChan := make(chan []string)
 	go toOLED(toOLEDChan)
 
-	toSerialChan := make(chan [2]string)
+	toSerialChan := make(chan []string)
 	go toSerial(toSerialChan)
 
 	for {
 		if s, more := <-c; more {
+			if s == nil {
+				s = make([]string, 1)
+				s[0] = `PowerOff!`
+			}
 			select {
 			case toSerialChan <- s:
 			default:

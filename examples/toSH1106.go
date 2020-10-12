@@ -13,11 +13,11 @@ import (
 	"tinygo.org/x/tinyfont/freesans"
 )
 
-func toOLED(c chan [2]string) {
+func toOLED(c chan []string) {
 
 	d := sh1106.NewI2C(machine.I2C0)
 
-	time.Sleep(2500 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	d.Configure(sh1106.Config{
 		Width: 128, Height: 64,
 		Address: sh1106.Address,
@@ -27,8 +27,11 @@ func toOLED(c chan [2]string) {
 		if s, more := <-c; more {
 			var black = color.RGBA{1, 1, 1, 255}
 			d.ClearBuffer()
-			tinyfont.WriteLine(&d, &freesans.Regular9pt7b, 0, 15, s[0], black)
-			tinyfont.WriteLine(&d, &freesans.Regular9pt7b, 0, 31, s[1], black)
+			for i := range s {
+				if i < 4 {
+					tinyfont.WriteLine(&d, &freesans.Regular9pt7b, 0, int16(i)*16+15, s[i], black)
+				}
+			}
 			d.Display()
 		} else {
 			fmt.Println(`Channel closed for OLED`)

@@ -13,9 +13,8 @@ func (r AKC695X) SetAMCNRThreshold(th uint8) {
 }
 
 // SetFreqencyDiffThreshold . see datasheet.
-func (r AKC695X) SetFreqencyDiffThreshold(th uint8) error {
+func (r AKC695X) SetFreqencyDiffThreshold(th uint8) {
 	r.reg[0x08] = r.reg[0x08]&0b11110011 | (th&0b00000011)<<2
-	return nil
 }
 
 // SetFMStereoCNRThreshold . if th=0 -4dB, th=1 -8dB, th=2 -12dB, th=3 -16dB.

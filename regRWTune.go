@@ -106,7 +106,7 @@ func (r AKC695X) SetFreq(kHz uint32) (err error) {
 			r.reg[0x05] = byte((r.fmhighch >> 5) + 1) // SetChannelRange
 		}
 
-		channel = r.freqToChannelFM(kHz)
+		channel = freqToChannelFM(kHz)
 	}
 
 	r.reg[0x00] |= 1 << 5                                    // Set TuneBit
