@@ -12,8 +12,10 @@ import (
 func tunerStatus(r *akc695x.AKC695X, c1 chan []string, wait *sync.WaitGroup) {
 	defer wait.Done()
 
-	for {
+	interval := 200 * time.Millisecond
+	var laststr []string
 
+	for {
 		var s []string
 		if r.IsPowerOn() {
 			s = make([]string, 4)
@@ -31,11 +33,15 @@ func tunerStatus(r *akc695x.AKC695X, c1 chan []string, wait *sync.WaitGroup) {
 			s[2] = `Vol` + strconv.Itoa(int(r.GetVolume())) + ` ` +
 				strconv.FormatFloat(float64(r.GetVCCMilliVolt())/1000, 'f', 2, 32) + `V`
 		}
-		select {
-		case c1 <- s:
-		default:
-			fmt.Println("DataSink busy.")
+		if !sameStringaSlice(s, laststr) {
+			select {
+			case c1 <- s:
+			default:
+				fmt.Println("DataSink busy.", interval)
+				interval += interval >> 1
+			}
 		}
-		time.Sleep(100 * time.Millisecond)
+		laststr = s
+		time.Sleep(interval)
 	}
 }

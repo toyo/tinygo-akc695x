@@ -12,18 +12,23 @@ func main() {
 
 	time.Sleep(3 * time.Second)
 
-	if err := machine.I2C0.Configure(machine.I2CConfig{}); err != nil {
+	if err := machine.I2C0.Configure(machine.I2CConfig{Frequency: 100000}); err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	messageFromTunerToDisplay := make(chan []string)
+	messageFromTuner := make(chan []string)
 
 	wait.Add(1)
-	go tuner(machine.D3, messageFromTunerToDisplay, &wait)
+	go fromTuner(messageFromTuner, &wait)
+
+	messageToDisplay := make(chan []string)
 
 	wait.Add(1)
-	go statusMonitor(messageFromTunerToDisplay, &wait)
+	go addClock(messageFromTuner, messageToDisplay, &wait)
+
+	wait.Add(1)
+	go toDisplay(messageToDisplay, &wait)
 
 	wait.Wait()
 }

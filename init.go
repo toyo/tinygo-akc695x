@@ -1,16 +1,12 @@
 package akc695x
 
 import (
-	"machine"
-	"time"
-
 	"tinygo.org/x/drivers"
 )
 
 // Config is config setting for AKC695X class.
 type Config struct {
 	I2CAddr        uint8
-	ResetPin       machine.Pin // if No ResetPin, set 255.
 	MWBand, FMBand uint8
 	FMLow, FMHigh  uint32
 }
@@ -19,7 +15,6 @@ type Config struct {
 type AKC695X struct {
 	i2cinterface      drivers.I2C
 	i2caddr           uint8
-	resetpin          machine.Pin
 	mwband, fmband    uint8
 	fmlowch, fmhighch uint16
 	reg               []byte
@@ -42,7 +37,6 @@ func (r *AKC695X) Configure(config Config) (err error) {
 	if config.I2CAddr != 0 {
 		r.i2caddr = config.I2CAddr
 	}
-	r.resetpin = config.ResetPin
 
 	r.mwband = config.MWBand
 	r.fmband = config.FMBand
@@ -59,22 +53,8 @@ func (r *AKC695X) Configure(config Config) (err error) {
 	return
 }
 
-func (r AKC695X) reset() {
-	if r.resetpin != 255 {
-		r.resetpin.Set(false)
-		time.Sleep(10 * time.Millisecond)
-		r.resetpin.Set(true)
-		time.Sleep(10 * time.Millisecond)
-	}
-}
-
 // PowerOn turns on tuner
 func (r AKC695X) PowerOn(khz uint32, Volume uint8, VolumeControlI2C bool) (err error) {
-
-	if r.resetpin != 255 {
-		r.resetpin.Configure(machine.PinConfig{Mode: machine.PinOutput})
-		r.reset()
-	}
 
 	r.reg[0x00] |= 1 << 7  // PowerOn
 	r.reg[0x00] &^= 1 << 2 // No Mute

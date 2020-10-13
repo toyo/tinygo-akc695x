@@ -8,17 +8,16 @@ import (
 )
 
 // Please set resetpin to 255 if there is no p_on connetction.
-func tuner(resetpin machine.Pin, c1 chan []string, givenWait *sync.WaitGroup) {
+func fromTuner(c1 chan []string, givenWait *sync.WaitGroup) {
 	defer givenWait.Done()
 
 	r := akc695x.New(machine.I2C0)
 
 	if err := r.Configure(akc695x.Config{
-		ResetPin: resetpin,
-		MWBand:   2,     // JP Band
-		FMBand:   7,     // JP Band
-		FMLow:    76000, // JP Band
-		FMHigh:   95000, // JP Band
+		MWBand: 2,     // JP Band
+		FMBand: 7,     // JP Band
+		FMLow:  76000, // JP Band
+		FMHigh: 95000, // JP Band
 	}); err != nil {
 		panic(err)
 	}
