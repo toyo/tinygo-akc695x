@@ -14,7 +14,7 @@ func tunerControl(message string, funcMap map[byte]func() error, wait *sync.Wait
 	rbuf := make([]byte, 1)
 
 	for {
-		if len, err := machine.UART0.Read(rbuf); err == nil {
+		if len, err := machine.USB.Read(rbuf); err == nil {
 			if len != 0 {
 				if f, ok := funcMap[rbuf[0]]; ok {
 					if err := f(); err != nil {

@@ -36,7 +36,7 @@ func fromTuner(c1 chan []string, givenWait *sync.WaitGroup) {
 		"Type s for Seek incrementaly\n"+
 		"Type r for Seek decrementaly\n",
 		map[byte]func() error{
-			'P': func() error { return r.PowerOn(79500, 50, true) }, // JODV-FM
+			'P': func() error { return r.PowerOn(79500, 40, true) }, // JODV-FM
 			'p': r.PowerOff,
 			'+': r.VolumeUp,
 			'-': r.VolumeDown,
